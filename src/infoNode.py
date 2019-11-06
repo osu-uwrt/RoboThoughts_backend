@@ -23,7 +23,7 @@ def bboxes_callback(msg):
     bottom_right = msg.bottom_right
 
 def depth_callback(msg):
-    depth = msg.depth
+     depth = msg.depth
     pressure = msg.pressure
     temp = msg.temp
     altitude = msg.altitude
