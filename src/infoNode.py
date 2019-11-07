@@ -4,43 +4,45 @@
 
 import rospy
 import rospkg
+import rospkg
 import yaml
-
+import yaml
+from riptide_msgs.msg import BoundingBox
 from riptide_msgs.msg import ControlStatus
+from riptide_msgs.msg import ControlStatus
+from riptide_msgs.msg import Depth
 from riptide_msgs.msg import Depth
 from riptide_msgs.msg import Dvl
 from riptide_msgs.msg import Imu
 from riptide_msgs.msg import Object
 from riptide_msgs.msg import SwitchState
-from darknet_ros_msgs.msg import BoundingBoxes
 
-from std_msgs.msg import String
 
 rpack = rospkg.RosPack()
-config_path = rpack.get_path('riptide_robothoughts') + "/cfg/infoNode_cfg.yaml"
+rpack = rospkg.RosPack()
+config_path = rpack.get_path('RoboThoughts') + "backend/src/cfg/infoNode_cfg.yml"
+config_path = rpack.get_path('RoboThoughts') + "backend/src/cfg/infoNode_cfg.yml"
+pubs = {}
 pubs = {}
 cfg = {}
+cfg = {}
 
-def controls_depth_callback(msg):
-    reference = msg.reference
-    current = msg.current
-    error = msg.error
-
-def state_depth_callback(msg):
-    depth = msg.depth
-    pressure = msg.pressure
-    temp = msg.temp
-    altitude = msg.altitude
-    f = open("/home/osu/osu-uwrt/riptide_software/src/riptide_robothoughts/api/data.txt", "w")
-    f.write("%f\n" % depth)
-    f.write("%f\n" % pressure)
-    f.write("%f\n" % temp)
-    f.write('%f\n' % altitude)
-    f.close()
 
 def bboxes_callback(msg):
     top_left = msg.top_left
     bottom_right = msg.bottom_right
+
+def depth_callback(msg):
+def depth_callback(msg):
+    depth = msg.depth
+	depth = msg.depth
+    pressure = msg.pressure
+    pressure = msg.pressure
+    temp = msg.temp
+    temp = msg.temp
+    altitude = msg.altitude
+    altitude = msg.altitude
+
 
 def dvl_callback(msg):
     time = msg.time
@@ -48,22 +50,66 @@ def dvl_callback(msg):
     dt2 = msg.dt2
     velocity = msg.velocity
     vehicle_pos = msg.vehicle_pos
-    figure_of_merit = msg.figureOfMerit
-    beam_distance = msg.beamDistance
-    battery_voltage = msg.batteryVoltage
-    speed_sound = msg.speedSound
-    pressure = msg.pressure
-    temp = msg.temp
-
+	figureOfMerit = msg.figureOfMerit
+	beamDistance = msg.beamDistance
+	batteryVoltage = msg.batteryVoltage
+	speedSound = msg.speedSound
+	pressure = msg.pressure
+	temp = msg.temp
 
 def imu_callback(msg):
-    test = 1
+	quaternion = msg.quaternion
+	rpy_rad = msg.rpy_rad
+	rpy_deg = msg.rpy_deg
+	heading_alt = msg.heading_alt
+	heading_lord = msg.heading_lord
+	linear_accel = msg.linear_accel
+	ang_vel_rad = msg.ang_vel_rad
+	ang_vel_deg = msg.ang_vel_deg
+	ang_accel_rad = msg.ang_accel_rad
+	ang_accel_deg = msg.ang_accel_deg
 
 def object_callback(msg):
-    test = 1
+	# name of object camera is looking at
+	object_name = msg.object_name
+	# bounding box in pixels
+	bbox_width = msg.bbox_width
+	bbox_height = msg.bbox_height
+	# center position in pixels relative to camera center
+	pos = msg.pos
 
 def switches_callback(msg):
-    test = 1
+	kill = msg.kill
+	sw1 = msg.sw1
+	sw2 = msg.sw2
+	sw3 = msg.sw3
+	sw4 = msg.sw4
+	sw5 = msg.sw5
+
+def loadConfig():
+def loadConfig():
+    global cfg
+    global cfg
+    with open(config_path, 'r') as stream:
+    with open(config_path, 'r') as stream:
+        cfg = yaml.load(stream)
+        cfg = yaml.load(stream)
+
+
+def main():
+def main():
+    loadConfig()
+    loadConfig()
+	bbox_sub = rospy.Subscriber(cfg['bboxes_topic'], BoundingBoxes, bboxes_callback)
+    depth_sub = rospy.Subscriber(cfg['depth_topic'], Depth, depth_callback)
+    depth_sub = rospy.Subscriber(cfg['depth_topic'], Depth, depth_callback)
+	dvl_sub = rospy.Subscriber(cfg['dvl_topic'], Dvl, dvl_callback)
+	imu_sub = rospy.Subscriber(cfg['imu_topic'], Imu, imu_callback)
+	object_sub = rospy.Subscriber(cfg['object_topic'], Object, object_callback)
+	switches_sub = rospy.Subscriber(cfg['switches_topic'], SwitchState, switches_callback)
+
+
+    rospy.spin()
 
 def loadConfig():
     global cfg
