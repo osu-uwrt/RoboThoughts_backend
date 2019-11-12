@@ -1,5 +1,0 @@
-<launch>
-
-    <node name="infoNode" pkg="riptide_robothoughts" type="infoNode.py"/>
-
-</launch>

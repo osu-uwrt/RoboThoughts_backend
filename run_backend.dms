@@ -1,0 +1,7 @@
+#!/bin/bash
+
+#start web server
+rosrun web_video_server web_video_server &
+
+#start up app.py
+python app.py &
