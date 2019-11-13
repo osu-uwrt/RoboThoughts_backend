@@ -3,8 +3,7 @@ from flask import Flask, jsonify, request, abort, make_response
 
 import rospy
 import rospkg
-import yaml
-import robot_data 
+import yaml 
 from riptide_msgs.msg import ControlStatus
 from riptide_msgs.msg import Depth
 from riptide_msgs.msg import Dvl
@@ -14,6 +13,8 @@ from riptide_msgs.msg import SwitchState
 from darknet_ros_msgs.msg import BoundingBoxes
 import os
 import threading
+
+from helper import state_depth_helper
 
 from std_msgs.msg import String
 
@@ -33,11 +34,7 @@ def respond():
             output.append({'Controls_Depth' : arr})
 
         if json_input['data'] == 'State_Depth':
-            arr = []
-            arr.append({'depth' : robot_data.depth})
-            arr.append({'pressure' : robot_data.pressure})
-            arr.append({'temp' : robot_data.temp})
-            arr.append({'altitude' : robot_data.altitude})  
+            arr = state_depth_helper.json_builder()
             output.append({'State_Depth' : arr})
 
         if json_input['data'] == 'Bboxes':
@@ -82,7 +79,7 @@ def invalid(error):
     return make_response(jsonify({'error':'Invalid JSON Request'}), 400)
 
 rpack = rospkg.RosPack()
-config_path = os.getcwd() + "/infoNode_cfg.yaml"
+config_path = os.getcwd() + "/api/infoNode_cfg.yaml"
 pubs = {}
 cfg = {}
 
@@ -91,11 +88,12 @@ def controls_depth_callback(msg):
     current = msg.current
     error = msg.error
 
+
 def state_depth_callback(msg):
-    robot_data.depth = msg.depth
-    robot_data.pressure = msg.pressure
-    robot_data.temp = msg.temp
-    robot_data.altitude = msg.altitude
+    state_depth_helper.depth = msg.depth
+    state_depth_helper.pressure = msg.pressure
+    state_depth_helper.temp = msg.temp
+    state_depth_helper.altitude = msg.altitude
 
 
 def bboxes_callback(msg):
