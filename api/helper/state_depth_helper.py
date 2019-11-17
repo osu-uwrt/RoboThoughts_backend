@@ -7,14 +7,8 @@ global altitude
 
 def json_builder():
     arr = []
-    arr.append({'depth' : state_depth_helper.depth})
-    arr.append({'pressure' : state_depth_helper.pressure})
-    arr.append({'temp' : state_depth_helper.temp})
-    arr.append({'altitude' : state_depth_helper.altitude})
+    arr.append({'depth' : depth})
+    arr.append({'pressure' : pressure})
+    arr.append({'temp' : temp})
+    arr.append({'altitude' : altitude})
     return arr  
-
-def state_depth_callback(msg):
-    depth = msg.depth
-    pressure = msg.pressure
-    temp = msg.temp
-    altitude = msg.altitude

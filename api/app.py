@@ -128,7 +128,7 @@ def loadConfig():
     with open(config_path, 'r') as stream:
         cfg = yaml.load(stream)
 
-def main():
+def start_node():
     loadConfig()
 
     threading.Thread(target=lambda: rospy.init_node('infoNode', disable_signals=True)).start()
@@ -141,11 +141,8 @@ def main():
     object_sub = rospy.Subscriber(cfg['object_topic'], Object, object_callback)
     switches_sub = rospy.Subscriber(cfg['switches_topic'], SwitchState, switches_callback)
 
-    rospy.loginfo('Node started')
 
 if __name__ == '__main__':
-
-    main()
-    rospy.loginfo('Flask starting')
+    start_node()
     app.run(host='0.0.0.0', port=5000)
 
