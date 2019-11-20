@@ -1,0 +1,5 @@
+#!/bin/bash
+
+pip install flask
+sudo apt install ros-kinetic-web-video-server
+sudo apt install lsof
