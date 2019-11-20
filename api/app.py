@@ -13,66 +13,59 @@ from riptide_msgs.msg import SwitchState
 from darknet_ros_msgs.msg import BoundingBoxes
 import os
 import threading
-
-from helper import state_depth_helper
-
 from std_msgs.msg import String
+
+global controls_depth_msg
+global state_depth_msg
+global bboxes_msg
+global dvl_msg
+global imu_msg
+global object_msg
+global switches_msg
 
 app = Flask(__name__)
 
+@app.route('/', methods=['OPTIONS'])
+def opt_respond():
+    response = jsonify('{"pass"}')
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    response.headers.add('Access-Control-Allow-Headers', '*')
+    return response
+
 @app.route('/', methods=['POST'])
 def respond():
-    if not request.json or not 'request' in request.json:
-        abort(400)
-    output = []
-    for json_input in request.json['request']:
-        if json_input['data'] == 'Controls_Depth':
-            arr = []
-            arr.append({'reference' : 50})
-            arr.append({'current' : 50})
-            arr.append({'error' : 1})
-            output.append({'Controls_Depth' : arr})
+    try:
+        if not request.json or not 'request' in request.json:
+            abort(400)
+        output = []
+        for json_input in request.json['request']:
+            if json_input['data'] == 'Controls_Depth':
+                output.append({'Controls_Depth' : controls_depth_msg})
 
-        if json_input['data'] == 'State_Depth':
-            arr = state_depth_helper.json_builder()
-            output.append({'State_Depth' : arr})
+            if json_input['data'] == 'State_Depth':
+                output.append({'State_Depth' : state_depth_msg})
 
-        if json_input['data'] == 'Bboxes':
-            arr = []
-            arr.append({'enabled' : 50})
-            arr.append({'pingFrequency' : 50})
-            arr.append({'filename' : 'String'})
-            output.append({'Bboxes' : arr})
-            
-        if json_input['data'] == 'Dvl':
-            arr = []
-            arr.append({'enabled' : 50})
-            arr.append({'pingFrequency' : 50})
-            arr.append({'filename' : 'String'})
-            output.append({'Dvl' : arr})
+            if json_input['data'] == 'Bboxes':
+                output.append({'Bboxes' : bboxes_msg})
+                
+            if json_input['data'] == 'Dvl':
+                output.append({'Dvl' : dvl_msg})
 
-        if json_input['data'] == 'Imu':
-            arr = []
-            arr.append({'enabled' : 50})
-            arr.append({'pingFrequency' : 50})
-            arr.append({'filename' : 'String'})
-            output.append({'Imu' : arr})
+            if json_input['data'] == 'Imu':
+                output.append({'Imu' : imu_msg})
 
-        if json_input['data'] == 'Object':
-            arr = []
-            arr.append({'enabled' : 50})
-            arr.append({'pingFrequency' : 50})
-            arr.append({'filename' : 'String'})
-            output.append({'Object' : arr})
+            if json_input['data'] == 'Object':
+                output.append({'Object' : object_msg})
 
-        if json_input['data'] == 'Switches':
-            arr = []
-            arr.append({'enabled' : 50})
-            arr.append({'pingFrequency' : 50})
-            arr.append({'filename' : 'String'})
-            output.append({'Switches' : arr})
+            if json_input['data'] == 'Switches':
+                output.append({'Switches' : switches_msg})
 
-    return jsonify({'data' : output}), 201
+        response = jsonify({'data' : output})
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        response.headers.add('Access-Control-Allow-Headers', '*')
+        return response, 201
+    except Exception as e:
+        print(e)
 
 @app.errorhandler(400)
 def invalid(error):
@@ -84,44 +77,25 @@ pubs = {}
 cfg = {}
 
 def controls_depth_callback(msg):
-    reference = msg.reference
-    current = msg.current
-    error = msg.error
-
+    controls_depth_msg = yaml.load(str(msg))
 
 def state_depth_callback(msg):
-    state_depth_helper.depth = msg.depth
-    state_depth_helper.pressure = msg.pressure
-    state_depth_helper.temp = msg.temp
-    state_depth_helper.altitude = msg.altitude
-
+    state_depth_msg = yaml.load(str(msg))
 
 def bboxes_callback(msg):
-    top_left = msg.top_left
-    bottom_right = msg.bottom_right
+    bboxes_msg = yaml.load(str(msg))
 
 def dvl_callback(msg):
-    time = msg.time
-    dt1 = msg.dt1
-    dt2 = msg.dt2
-    velocity = msg.velocity
-    vehicle_pos = msg.vehicle_pos
-    figure_of_merit = msg.figureOfMerit
-    beam_distance = msg.beamDistance
-    battery_voltage = msg.batteryVoltage
-    speed_sound = msg.speedSound
-    pressure = msg.pressure
-    temp = msg.temp
-
+    dvl_msg = yaml.load(str(msg))
 
 def imu_callback(msg):
-    test = 1
+    imu_msg = yaml.load(str(msg))
 
 def object_callback(msg):
-    test = 1
+    object_msg = yaml.load(str(msg))
 
 def switches_callback(msg):
-    test = 1
+    switches_msg = yaml.load(str(msg))
 
 def loadConfig():
     global cfg
