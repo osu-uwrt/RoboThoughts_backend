@@ -97,24 +97,31 @@ cfg = {}
 
 #callbacks for the node
 def controls_depth_callback(msg):
+    global controls_depth_msg
     controls_depth_msg = yaml.load(str(msg))
 
 def state_depth_callback(msg):
+    global state_depth_msg 
     state_depth_msg = yaml.load(str(msg))
 
 def bboxes_callback(msg):
+    global bboxes_msg
     bboxes_msg = yaml.load(str(msg))
 
 def dvl_callback(msg):
+    global dvl_msg
     dvl_msg = yaml.load(str(msg))
 
 def imu_callback(msg):
+    global imu_msg
     imu_msg = yaml.load(str(msg))
 
 def object_callback(msg):
+    global object_msg
     object_msg = yaml.load(str(msg))
 
 def switches_callback(msg):
+    global switches_msg
     switches_msg = yaml.load(str(msg))
 
 #Gets the config
