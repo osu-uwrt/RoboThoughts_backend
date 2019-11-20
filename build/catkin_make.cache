@@ -1,2 +1,0 @@
-
--DCATKIN_DEVEL_PREFIX=/home/noah/osu-uwrt/RoboThoughts_backend/devel -DCMAKE_INSTALL_PREFIX=/home/noah/osu-uwrt/RoboThoughts_backend/install -G Unix Makefiles
