@@ -77,3 +77,9 @@ if requested.
   ]
 }
 ```
+
+Once `run_backend.dms` has been executed, the backend will be fully running. Identify what the
+host machine's IP address is. The backend can be reached by sending the POST request to 
+`http://<IP_ADDRESS>:5000` where `IP_ADDRESS` is the host machine's IP. The video feed can
+be accessed at `http://<IP_ADDRESS>:8080`. We recommend going directly to the image feed
+at `http://<IP_ADDRESS>/stream?topic=/darknet_ros/image_hud&default_transport=compressed`
