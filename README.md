@@ -1,10 +1,10 @@
 # Riptide Software
 
 #### Authors
-Nicholas Iten
-Noah Limes
-Clark Godwin
-Jerry Qiu
+Nicholas Iten,
+Noah Limes,
+Clark Godwin,
+Jerry Qiu,
 Seamus Scanlon
 
 ## Riptide Robothoughts
