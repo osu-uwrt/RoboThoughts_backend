@@ -15,7 +15,7 @@ import rospkg
 import yaml 
 from riptide_msgs.msg import ControlStatus
 from riptide_msgs.msg import Depth
-from riptide_msgs.msg import Dvl
+from nortek_dvl.msg import Dvl
 from riptide_msgs.msg import Imu
 from riptide_msgs.msg import Object
 from riptide_msgs.msg import SwitchState
