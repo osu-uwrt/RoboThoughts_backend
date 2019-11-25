@@ -138,13 +138,13 @@ def start_node():
     threading.Thread(target=lambda: rospy.init_node('infoNode', disable_signals=True)).start()
 
     #Subscribes the node to all of the topics we want
-    controls_depth_sub = rospy.Subscriber(cfg['controls_depth_topic'], ControlStatus, controls_depth_callback)
-    state_depth_sub = rospy.Subscriber(cfg['state_depth_topic'], Depth, state_depth_callback)
-    bboxes_sub = rospy.Subscriber(cfg['bboxes_topic'], BoundingBoxes, bboxes_callback)
-    dvl_sub = rospy.Subscriber(cfg['dvl_topic'], Dvl, dvl_callback)
-    imu_sub = rospy.Subscriber(cfg['imu_topic'], Imu, imu_callback)
-    object_sub = rospy.Subscriber(cfg['object_topic'], Object, object_callback)
-    switches_sub = rospy.Subscriber(cfg['switches_topic'], SwitchState, switches_callback)
+    controls_depth_sub = rospy.Subscriber(cfg['controls_depth_topic'], ControlStatus, controls_depth_callback, queue_size = 1)
+    state_depth_sub = rospy.Subscriber(cfg['state_depth_topic'], Depth, state_depth_callback, queue_size = 1)
+    bboxes_sub = rospy.Subscriber(cfg['bboxes_topic'], BoundingBoxes, bboxes_callback, queue_size = 1)
+    dvl_sub = rospy.Subscriber(cfg['dvl_topic'], Dvl, dvl_callback, queue_size = 1)
+    imu_sub = rospy.Subscriber(cfg['imu_topic'], Imu, imu_callback, queue_size = 1)
+    object_sub = rospy.Subscriber(cfg['object_topic'], Object, object_callback, queue_size = 1)
+    switches_sub = rospy.Subscriber(cfg['switches_topic'], SwitchState, switches_callback, queue_size = 1)
 
 #Start hte node and the server
 if __name__ == '__main__':
