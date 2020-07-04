@@ -1,10 +1,23 @@
 # infoNode_cfg.yml
 # This file defines the topics that infoNode.py wants to subsribe to
 
-controls_depth_topic: /status/controls/depth
-bboxes_topic: /state/bboxes
-state_depth_topic: /state/depth 
-dvl_topic: /state/dvl 
-imu_topic: /state/imu
-object_topic: /state/object
-switches_topic: /state/switches
+# controls_depth_topic: /puddles/status/controls/depth
+# bboxes_topic: /puddles/state/bboxes
+# state_depth_topic: /puddles/depth/raw 
+# dvl_topic: /puddles/dvl 
+# imu_topic: /puddles/imu/data
+# object_topic: /puddles/state/object
+# switches_topic: /puddles/state/switches 
+
+# depth_topic: /puddles/pose_gt/pose/pose/position/z
+# orientation_topic: /puddles/pose_gt/pose/pose/orientation
+# position_topic: /puddles/pose_gt/pose/pose/position
+# video_topic: /puddles/stereo/left/image_rect
+# switches_topic: /puddles/state/switches 
+
+pose_topic: /puddles/pose_gt
+video_topic: /puddles/stereo/left/image_rect_color/compressed # may switch to black and white feed
+switches_topic: /puddles/state/switches
+
+
+
