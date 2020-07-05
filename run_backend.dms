@@ -5,4 +5,4 @@ kill $(lsof -t -i:8080)
 rosrun web_video_server web_video_server &
 
 #start up app.py
-python ./api/appCopy.py
+python ./api/app.py

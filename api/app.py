@@ -1,37 +1,25 @@
 #!api/bin/python
 
-"""
-Authors:
-Nicholas Iten
-Noah Limes
-Clark Godwin
-Jerry Qiu
-Seamus Scanlon
-"""
-
 from flask import Flask, jsonify, request, abort, make_response
 import rospy
 import rospkg
-import yaml 
-from riptide_msgs.msg import ControlStatus
-from riptide_msgs.msg import Depth
-from nortek_dvl.msg import Dvl
-from riptide_msgs.msg import Imu
-from riptide_msgs.msg import Object
+import yaml
+import json 
+
+from nav_msgs.msg import Odometry
+from sensor_msgs.msg import CompressedImage
 from riptide_msgs.msg import SwitchState
-from darknet_ros_msgs.msg import BoundingBoxes
+
 import os
 import threading
 from std_msgs.msg import String
 
 #Global variables that store objects representing the JSON response
-global controls_depth_msg
-global state_depth_msg
-global bboxes_msg
-global dvl_msg
-global imu_msg
-global object_msg
-global switches_msg
+global depth
+global orientation
+global position
+global switches
+global video
 
 #Starts the initial flask server
 app = Flask(__name__)
@@ -55,23 +43,17 @@ def respond():
         #Goes through the request to find which data to send back
         output = []
         for json_input in request.json['request']:
-            if json_input['data'] == 'Controls_Depth':
-                output.append({'Controls_Depth' : controls_depth_msg})
+            if json_input['data'] == 'depth':
+                output.append({'depth' : depth})
 
-            if json_input['data'] == 'State_Depth':
-                output.append({'State_Depth' : state_depth_msg})
+            if json_input['data'] == 'orientation':
+                output.append({'orientation' : orientation})
 
-            if json_input['data'] == 'Bboxes':
-                output.append({'Bboxes' : bboxes_msg})
+            if json_input['data'] == 'position':
+                output.append({'position' : position})
                 
-            if json_input['data'] == 'Dvl':
+            if json_input['data'] == '':
                 output.append({'Dvl' : dvl_msg})
-
-            if json_input['data'] == 'Imu':
-                output.append({'Imu' : imu_msg})
-
-            if json_input['data'] == 'Object':
-                output.append({'Object' : object_msg})
 
             if json_input['data'] == 'Switches':
                 output.append({'Switches' : switches_msg})
@@ -96,29 +78,21 @@ pubs = {}
 cfg = {}
 
 #callbacks for the node
-def controls_depth_callback(msg):
-    global controls_depth_msg
-    controls_depth_msg = yaml.load(str(msg))
+def pose_callback(msg):
+    global position
+    global depth
+    global orientation  
+    msg = yaml.load(str(msg))['pose']['pose']
 
-def state_depth_callback(msg):
-    global state_depth_msg 
-    state_depth_msg = yaml.load(str(msg))
+    # store other data contained within the pose_gt topic
+    position = msg['position']
+    depth = position['z']
+    orientation = msg['orientation']
 
-def bboxes_callback(msg):
-    global bboxes_msg
-    bboxes_msg = yaml.load(str(msg))
+def video_callback(msg):
+    global video 
+    video = yaml.load(str(msg))
 
-def dvl_callback(msg):
-    global dvl_msg
-    dvl_msg = yaml.load(str(msg))
-
-def imu_callback(msg):
-    global imu_msg
-    imu_msg = yaml.load(str(msg))
-
-def object_callback(msg):
-    global object_msg
-    object_msg = yaml.load(str(msg))
 
 def switches_callback(msg):
     global switches_msg
@@ -138,16 +112,13 @@ def start_node():
     threading.Thread(target=lambda: rospy.init_node('infoNode', disable_signals=True)).start()
 
     #Subscribes the node to all of the topics we want
-    controls_depth_sub = rospy.Subscriber(cfg['controls_depth_topic'], ControlStatus, controls_depth_callback, queue_size = 1)
-    state_depth_sub = rospy.Subscriber(cfg['state_depth_topic'], Depth, state_depth_callback, queue_size = 1)
-    bboxes_sub = rospy.Subscriber(cfg['bboxes_topic'], BoundingBoxes, bboxes_callback, queue_size = 1)
-    dvl_sub = rospy.Subscriber(cfg['dvl_topic'], Dvl, dvl_callback, queue_size = 1)
-    imu_sub = rospy.Subscriber(cfg['imu_topic'], Imu, imu_callback, queue_size = 1)
-    object_sub = rospy.Subscriber(cfg['object_topic'], Object, object_callback, queue_size = 1)
+    pose_sub = rospy.Subscriber(cfg['pose_topic'], Odometry, pose_callback, queue_size = 1)
+    video_sub = rospy.Subscriber(cfg['video_topic'], CompressedImage, video_callback, queue_size = 1)
     switches_sub = rospy.Subscriber(cfg['switches_topic'], SwitchState, switches_callback, queue_size = 1)
 
 #Start hte node and the server
 if __name__ == '__main__':
     start_node()
-    app.run(host='0.0.0.0', port=5000)
+    # app.run(host='0.0.0.0', port=5000)
+    app.run()
 
