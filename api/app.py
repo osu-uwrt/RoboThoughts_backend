@@ -4,17 +4,19 @@ from flask import Flask, jsonify, request, abort, make_response
 import rospy
 import rospkg
 import yaml
-import json 
+import json
+import os
+import threading
+from std_msgs.msg import String 
 
+# loads data types of the ROS topics we will subscribe to
 from nav_msgs.msg import Odometry
 from sensor_msgs.msg import CompressedImage
 from riptide_msgs.msg import SwitchState
 
-import os
-import threading
-from std_msgs.msg import String
 
-#Global variables that store objects representing the JSON response
+
+# Declares global variables which will be sent back in our responses
 global depth
 global orientation
 global position
@@ -24,7 +26,7 @@ global video
 #Starts the initial flask server
 app = Flask(__name__)
 
-#Needed to permit Angular to interact with the server
+# handles OPTIONS requests sent to the server
 @app.route('/', methods=['OPTIONS'])
 def opt_respond():
     response = jsonify('{"pass"}')
@@ -58,7 +60,7 @@ def respond():
             if json_input['data'] == 'Switches':
                 output.append({'Switches' : switches_msg})
 
-        #Creates the JSON request and headers
+        #Creates the JSON response with correct headers
         response = jsonify({'data' : output})
         response.headers.add('Access-Control-Allow-Origin', '*')
         response.headers.add('Access-Control-Allow-Headers', '*')
@@ -71,20 +73,23 @@ def respond():
 def invalid(error):
     return make_response(jsonify({'error':'Invalid JSON Request'}), 400)
 
-#some stuff for the node setup
+#some stuff to set up the ROS Node
 rpack = rospkg.RosPack()
 config_path = os.getcwd() + "/api/infoNode_cfg.yaml"
 pubs = {}
 cfg = {}
 
-#callbacks for the node
+#callbacks which will be passed to subscribers on the Node:
+
 def pose_callback(msg):
     global position
     global depth
-    global orientation  
+    global orientation 
+
+    # loads the pose_gt topic data 
     msg = yaml.load(str(msg))['pose']['pose']
 
-    # store other data contained within the pose_gt topic
+    #  update global vars with new values located in the pose_gt topic
     position = msg['position']
     depth = position['z']
     orientation = msg['orientation']
@@ -93,32 +98,32 @@ def video_callback(msg):
     global video 
     video = yaml.load(str(msg))
 
-
 def switches_callback(msg):
     global switches_msg
     switches_msg = yaml.load(str(msg))
 
-#Gets the config
+# Gets the config
 def loadConfig():
     global cfg
     with open(config_path, 'r') as stream:
         cfg = yaml.load(stream)
 
 def start_node():
-    #Gets the config
+    # Gets the config
     loadConfig()
 
-    #starts the node on a new thread
+    # Starts the node on a new thread
     threading.Thread(target=lambda: rospy.init_node('infoNode', disable_signals=True)).start()
 
-    #Subscribes the node to all of the topics we want
+    # Subscribes the node to all of the topics we want
     pose_sub = rospy.Subscriber(cfg['pose_topic'], Odometry, pose_callback, queue_size = 1)
     video_sub = rospy.Subscriber(cfg['video_topic'], CompressedImage, video_callback, queue_size = 1)
     switches_sub = rospy.Subscriber(cfg['switches_topic'], SwitchState, switches_callback, queue_size = 1)
 
-#Start hte node and the server
+#Start the node and the server
 if __name__ == '__main__':
     start_node()
-    # app.run(host='0.0.0.0', port=5000)
-    app.run()
+    # host='0.0.0.0' parameter opens the server on the network
+    app.run(host='0.0.0.0', port=5000)
+    # app.run() with no params starts to server on local host
 
