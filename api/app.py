@@ -14,8 +14,6 @@ from nav_msgs.msg import Odometry
 from sensor_msgs.msg import CompressedImage
 from riptide_msgs.msg import SwitchState
 
-
-
 # Declares global variables which will be sent back in our responses
 global depth
 global orientation
