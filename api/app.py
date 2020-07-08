@@ -11,7 +11,7 @@ from std_msgs.msg import String
 
 # loads data types of the ROS topics we will subscribe to
 from nav_msgs.msg import Odometry
-from sensor_msgs.msg import CompressedImage
+# from sensor_msgs.msg import CompressedImage
 from riptide_msgs.msg import SwitchState
 
 # Declares global variables which will be sent back in our responses
@@ -66,6 +66,14 @@ def respond():
     except Exception as e:
         print(e)
 
+@app.route('/video_feed')
+def video_feed():
+    output = 'http://0.0.0.0:8080/stream?topic=/puddles/stereo/left/image_rect_color&type=mjpeg&quality=25'
+    response = jsonify({'data' : output})
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    response.headers.add('Access-Control-Allow-Headers', '*')
+    return response, 201
+
 #Tells the requester if they messed up the JSON Request
 @app.errorhandler(400)
 def invalid(error):
@@ -92,10 +100,6 @@ def pose_callback(msg):
     depth = position['z']
     orientation = msg['orientation']
 
-def video_callback(msg):
-    global video 
-    video = yaml.load(str(msg))
-
 def switches_callback(msg):
     global switches_msg
     switches_msg = yaml.load(str(msg))
@@ -115,7 +119,6 @@ def start_node():
 
     # Subscribes the node to all of the topics we want
     pose_sub = rospy.Subscriber(cfg['pose_topic'], Odometry, pose_callback, queue_size = 1)
-    video_sub = rospy.Subscriber(cfg['video_topic'], CompressedImage, video_callback, queue_size = 1)
     switches_sub = rospy.Subscriber(cfg['switches_topic'], SwitchState, switches_callback, queue_size = 1)
 
 #Start the node and the server
@@ -124,4 +127,4 @@ if __name__ == '__main__':
     # host='0.0.0.0' parameter opens the server on the network
     app.run(host='0.0.0.0', port=5000)
     # app.run() with no params starts to server on local host
-
+    
