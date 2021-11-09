@@ -15,7 +15,7 @@
 # video_topic: /puddles/stereo/left/image_rect
 # switches_topic: /puddles/state/switches 
 
-pose_topic: /puddles/pose_gt
+pose_topic: /puddles/odometry/filtered
 video_topic: /puddles/stereo/left/image_rect_color/compressed # may switch to black and white feed
 switches_topic: /puddles/state/switches
 

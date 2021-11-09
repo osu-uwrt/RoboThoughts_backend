@@ -22,17 +22,40 @@ The Ohio State University
 
 ## Initial Setup
 
-In order to run the backend ensure the system is up to date by running `setup.dms` in the Ubuntu terminal.
+In order to run the backend and nginx stream follow the steps below.
+
+1. "cd src/riptide_robothoughts/setup"
+
+2. Run "sudo ./installRobothoughtsDependencies" to install all of the dependencies and to get nginx.
+
+3. "cd nginxHLS/nginx-1.18.0"
+
+4. Compile with the nessecary rtmp module nginx by running: 
+"./configure --with-http_ssl_module --add-module=../nginx-rtmp-module"
+"make"
+"sudo make install"
+
+5. Change back into the setup directory "cd ../.."
+
+6. Copy the nginx config file into installation "sudo cp nginx.conf /usr/local/nginx/conf/nginx.conf"
+
+7. Recommended: Test the nginx configuration "/usr/local/nginx/sbin/nginx -t"
+
+## Testing the Backend
+
+To test the backend configuration and setup run the testBackendWithNginxStream.sh file. This test does not require a running ROS instance and therefore can be ran without connection to riptide / simulation. This will attempt to stream video from "/dev/video0". If there is no video at"/dev/video0" the stream will fail. Additional errors will be thrown from the frontend console as it will not be able to fetch the riptide position, battery, etc... data. These can be ignored - probably.
+
+To run the backend without streaming run the app.py python script.
+
+To kill the test stream and backend run the stopNginxStreamProesses file.
 
 ## Starting the Backend
 
-The backend environment is controlled entirely by running `run_backend.dms` in the Ubuntu terminal. In
-order to communicate with the robot, be sure to run the following command:
-`export ROS_MASTER_URI=https://baycat:11311`
- 
-If running inside of Docker, ensure that ports 5000 and 8080 are exposed. This can be done by starting
-a container with the `-p 5000:5000 -p 8080:8080` flags. These ports are the only method of accessing
-the backend.
+To run the backend, run the  runBackendWithNginxStream.sh file. This must be ran only when a master ROS node is reachable - either physically or in simulation. 
+
+To kill the test stream and backend run the stopNginxStreamProesses file.
+
+Note: Running the simulation and backend stream requires much computational power. The stream will likely be lagging if working at all.
 
 ## Functionality
 

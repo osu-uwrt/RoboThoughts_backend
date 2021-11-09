@@ -1,6 +1,0 @@
-#!/bin/bash
-
-sudo apt install python-pip
-pip install flask
-sudo apt install ros-melodic-web-video-server
-sudo apt install lsof

@@ -7,12 +7,15 @@ import yaml
 import json
 import os
 import threading
+import subprocess
 from std_msgs.msg import String 
 
 # loads data types of the ROS topics we will subscribe to
 from nav_msgs.msg import Odometry
+from riptide_hardware.msg import Depth
 # from sensor_msgs.msg import CompressedImage
-from riptide_msgs.msg import SwitchState
+#from riptide_descriptions import SwitchState --- remove/does not exist
+
 
 # Declares global variables which will be sent back in our responses
 global depth
@@ -20,6 +23,7 @@ global orientation
 global position
 global switches
 global video
+global video_feed_URL
 
 #Starts the initial flask server
 app = Flask(__name__)
@@ -52,8 +56,8 @@ def respond():
             if json_input['data'] == 'position':
                 output.append({'position' : position})
                 
-            if json_input['data'] == '':
-                output.append({'Dvl' : dvl_msg})
+           # if json_input['data'] == '':
+           #     output.append({'Dvl' : dvl_msg})
 
             if json_input['data'] == 'Switches':
                 output.append({'Switches' : switches_msg})
@@ -66,12 +70,33 @@ def respond():
     except Exception as e:
         print(e)
 
+@app.route('/video_feed', methods=['OPTIONS'])
+def opt_test_respond():
+    response = jsonify('{"pass"}')
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    response.headers.add('Access-Control-Allow-Headers', '*')
+    return response
+
+@app.route('/video_feed', methods=['POST'])
+def test_respond():
+    try:
+        output = [{'url': video_feed_URL}]
+
+        response = jsonify({'data': output})
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        response.headers.add('Access-Control-Allow-Headers', '*')
+        return response, 201
+    except Exception as e:
+        print(e)
+
+
 @app.route('/video_feed')
 def video_feed():
-    output = 'http://0.0.0.0:8080/stream?topic=/puddles/stereo/left/image_rect_color&type=mjpeg&quality=25'
+    output = 'http://0.0.0.0:8081/hls/stream.m3u8'
     response = jsonify({'data' : output})
     response.headers.add('Access-Control-Allow-Origin', '*')
     response.headers.add('Access-Control-Allow-Headers', '*')
+    print(output)
     return response, 201
 
 #Tells the requester if they messed up the JSON Request
@@ -87,7 +112,7 @@ cfg = {}
 
 #callbacks which will be passed to subscribers on the Node:
 
-def pose_callback(msg):
+def pose_callback(msg):    
     global position
     global depth
     global orientation 
@@ -118,8 +143,19 @@ def start_node():
     threading.Thread(target=lambda: rospy.init_node('infoNode', disable_signals=True)).start()
 
     # Subscribes the node to all of the topics we want
+        
     pose_sub = rospy.Subscriber(cfg['pose_topic'], Odometry, pose_callback, queue_size = 1)
-    switches_sub = rospy.Subscriber(cfg['switches_topic'], SwitchState, switches_callback, queue_size = 1)
+    #switches_sub = rospy.Subscriber(cfg['switches_topic'], SwitchState, switches_callback, queue_size = 1) --- remove/does not exist
+
+#get the ip address of the server
+def getVideoStreamURL() -> String:
+    getIPProcess = subprocess.Popen("hostname -I | awk '{print $1}'", shell=True, stdout=subprocess.PIPE)  
+    rawIPOutput, _ = getIPProcess.communicate()
+
+    return "http://" + str(rawIPOutput[:-1])[2:-1] + ":8081/hls/stream.m3u8"
+
+#sset web stream URL to be served to clients
+video_feed_URL = getVideoStreamURL()
 
 #Start the node and the server
 if __name__ == '__main__':
