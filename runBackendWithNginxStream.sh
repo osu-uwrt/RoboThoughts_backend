@@ -25,7 +25,7 @@ python3 ./api/app.py &> /dev/null &
 sleep 3
 
 #launch ros web video server
-rosrun web_video_server web_video_server &
+rosrun web_video_server web_video_server _image_transport:=compressed &
 
 #Launch the NGINX proxy server
 sudo /usr/local/nginx/sbin/nginx
@@ -34,6 +34,7 @@ sudo /usr/local/nginx/sbin/nginx
 sleep 5
 
 #Launch ffmpeg - this step could possibly be avoided with the addition of HLS to HTTP module in nginx
-ffmpeg -i http://0.0.0.0:8080/stream?topic=/puddles/stereo/left/image_color  -vcodec libx264 -x264-params keyint=10:scenecut=0 -vprofile baseline -acodec libmp3lame -ar 44100 -ac 1 -f flv rtmp://0.0.0.0/puddles/stream &
+ffmpeg -i http://0.0.0.0:8080/stream?topic=/puddles/stereo/left/image_color -vcodec libx264 -x264-params keyint=18:scenecut=0 -acodec libmp3lame -ar 44100 -ac 1 -f flv rtmp://0.0.0.0/puddles/stream &
 
 #Be sure to intall react hls player -> "react-hls-player" -> in the frontend
+echo "Launched all stream elements!"

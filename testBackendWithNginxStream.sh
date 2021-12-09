@@ -37,5 +37,7 @@ sudo /usr/local/nginx/sbin/nginx
 sleep 5
 
 #Launch ffmpeg - this step could possibly be avoided with the addition of HLS to HTTP module in nginx
-ffmpeg -i /dev/video0  -vcodec libx264 -x264-params keyint=30:scenecut=0 -acodec libmp3lame -ar 44100 -ac 1 -f flv rtmp://0.0.0.0/puddles/stream -loglevel error &
+ffmpeg -i /dev/video0 -vcodec libx264 -x264-params keyint=30:scenecut=0 -acodec libmp3lame -ar 44100 -ac 1 -f flv rtmp://0.0.0.0/puddles/stream -loglevel error &
 
+#
+echo "Launched all stream elements!"
